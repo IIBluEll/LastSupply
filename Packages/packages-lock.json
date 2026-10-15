@@ -1,5 +1,21 @@
 {
   "dependencies": {
+    "com.hm.codebase": {
+      "version": "https://github.com/IIBluEll/HM_CodeBase.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.2"
+      },
+      "hash": "fb08effd5ffc8afab1d4e428c7a1ca9574c3d504"
+    },
+    "com.hm.unity-project-inspector": {
+      "version": "https://github.com/IIBluEll/UnityPackage_Unity_Inspector.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8c68ea3e85c0b2a632e70e9022f9e310ac74a31a"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.13",
       "depth": 0,
@@ -90,6 +106,13 @@
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.6",
       "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.2",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
