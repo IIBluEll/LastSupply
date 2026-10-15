@@ -17,12 +17,12 @@ namespace LastSupply.Core
                 throw new ArgumentNullException(nameof(definition));
             }
 
-            if ( currentHp < 0 || currentHp > definition.MaxHp )
+            if ( currentHp < 0 || currentHp > definition.MaxHP )
             {
                 throw new ArgumentOutOfRangeException(nameof(currentHp));
             }
 
-            SurvivorId = definition.Id;
+            SurvivorId = definition.ID;
             CurrentHp = currentHp;
         }
     }
