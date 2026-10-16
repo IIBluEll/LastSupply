@@ -33,6 +33,11 @@ namespace LastSupply.Core
             Parts = parts;
         }
 
+        public ResourceAmount Add(ResourceAmount amount)
+        {
+            return new ResourceAmount(checked(Food + amount.Food), checked(Medicine + amount.Medicine), checked(Parts + amount.Parts));
+        }
+
         public ResourceAmount Add(RESOURCE_TYPE resourceType , int amount)
         {
             if ( amount < 0 )

@@ -8,7 +8,7 @@
 >
 > **필수 사용 기술:** Unity / C# / UniTask / HM CodeBase
 >
-> **상태:** 설계 기준 문서. Core 데이터 정의·기본 콘텐츠를 일부 구현했으며, GameSession·Unity 연결은 미구현이다. 현재 구현 범위와 검사 방법은 [데이터 구현 안내](LAST_SUPPLY_데이터_구현_안내.md)를 따른다.
+> **상태:** 설계 기준 문서. 2026-10-16에 GameSession의 순수 C# 진행·정산·치료·승패를 구현했다. 현재 API와 검사는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md), 데이터 생성은 [데이터 구현 안내](LAST_SUPPLY_데이터_구현_안내.md)를 따른다. Unity 연결은 미구현이다. 아래 클래스 구성은 설계 제안이며 실제 상태 원본은 GameSession이 직접 소유한다.
 
 ---
 

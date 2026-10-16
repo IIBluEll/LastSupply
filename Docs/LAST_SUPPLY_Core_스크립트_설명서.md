@@ -1,5 +1,7 @@
 # LAST SUPPLY Core 스크립트 설명서
 
+> **2026-10-16 추가:** 아래는 기존 Core 23개 파일의 설명이다. 이후 추가한 GameSession·Snapshot·정산 규칙과 기록·종료 사유의 최신 API 및 검사는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md)를 따른다.
+
 > 작성일: 2026-10-15
 >
 > 기준: `Assets/01_Main/02_Scripts/Core`에 있는 실제 C# 스크립트 23개.
