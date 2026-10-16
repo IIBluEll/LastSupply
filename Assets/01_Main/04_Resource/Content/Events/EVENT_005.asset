@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add15bedd6ad4cb4838cbf5ffcbf8d5c, type: 3}
+  m_Name: EVENT_005
+  m_EditorClassIdentifier: Assembly-CSharp::LastSupply.Content.EventConfig
+  _id: EVENT_005
+  _displayName: "\uBB34\uB108\uC9C8 \uB4EF\uD55C \uC120\uBC18"
+  _description: "\uBD88\uC548\uC815\uD55C \uC120\uBC18 \uC704\uC5D0 \uBB3C\uC790\uAC00
+    \uB0A8\uC544 \uC788\uB2E4. \uAC74\uB4DC\uB9AC\uBA74 \uBB34\uB108\uC9C8 \uC218\uB3C4
+    \uC788\uB2E4."
+  _category: 0
+  _mode: 2
+  _minStage: 1
+  _maxStage: 5
+  _instantEffect:
+    _hpChange: 0
+    _noiseIncrease: 0
+    _rewards: []
+  _actions:
+  - _id: TAKE
+    _text: "\uBB3C\uC790\uB97C \uAEBC\uB0B8\uB2E4"
+    _requiresCheck: 1
+    _statType: 0
+    _difficulty: 13
+    _effect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards:
+      - _useRegionResource: 1
+        _resourceType: 0
+        _amount: 3
+    _failureEffect:
+      _hpChange: -1
+      _noiseIncrease: 2
+      _rewards: []
+  - _id: PASS
+    _text: "\uC9C0\uB098\uCE5C\uB2E4"
+    _requiresCheck: 0
+    _statType: 0
+    _difficulty: 12
+    _effect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards: []
+    _failureEffect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards: []

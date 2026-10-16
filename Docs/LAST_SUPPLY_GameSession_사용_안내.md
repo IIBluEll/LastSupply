@@ -2,7 +2,7 @@
 
 > 2026-10-16 / 게임 기획서·코드 설계서 v0.3 기준.
 >
-> 순수 C# 진행을 구현했다. Unity 콘텐츠 에셋·Provider·UI·연출 연결과 Unity 전체 컴파일·Play Mode·빌드는 별도 작업이다.
+> 순수 C# 진행과 콘텐츠 카탈로그·기본 에셋을 구현했다. 데이터 시작점은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)를 따른다. Provider·UI·연출 연결과 원래 프로젝트의 Unity 전체 컴파일·Play Mode·빌드는 별도 작업이다.
 
 ## 1. 상태 소유와 시작
 
@@ -67,4 +67,4 @@ pwsh -NoProfile -File .\Tests\CoreSession\Verify-CoreSession.ps1
 
 첫 검사는 기존 콘텐츠·수색 데이터를 확인한다. 두 번째 검사는 실제 Core와 Tests/CoreSession의 검사 소스를 C# 9로 함께 컴파일한다. 고정 난수로 사건·수색·귀환·사망·정산·치료·승패·중복 입력·거절 입력의 난수 미소비를 검사하고, 100개 seed로 기본판의 게임 종료와 새 Session 재시작을 확인한다. 프로젝트 파일을 변경하지 않는다.
 
-이는 .NET에서의 Core 컴파일·진행 검사다. Unity 전체 컴파일·Console·EditMode/PlayMode·실제 플레이 및 밸런스 검증을 뜻하지 않는다. 이후 작업은 ScriptableObject 변환과 Provider·최소 UI 연결이다.
+이는 .NET에서의 Core 컴파일·진행 검사다. Unity 전체 컴파일·Console·EditMode/PlayMode·실제 플레이 및 밸런스 검증을 뜻하지 않는다. 이후 추가한 ScriptableObject 변환·에셋의 Unity 배치 검사는 Content 사용 안내에 기록했다. 다음 사용자 작업은 Provider·최소 UI 연결이다.

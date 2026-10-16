@@ -8,7 +8,7 @@
 >
 > **필수 사용 기술:** Unity / C# / UniTask / HM CodeBase
 >
-> **상태:** 설계 기준 문서. 2026-10-16에 GameSession의 순수 C# 진행·정산·치료·승패를 구현했다. 현재 API와 검사는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md), 데이터 생성은 [데이터 구현 안내](LAST_SUPPLY_데이터_구현_안내.md)를 따른다. Unity 연결은 미구현이다. 아래 클래스 구성은 설계 제안이며 실제 상태 원본은 GameSession이 직접 소유한다.
+> **상태:** 설계 기준 문서. 2026-10-16에 GameSession과 콘텐츠 카탈로그·기본 에셋 12개를 구현했다. 진행 API는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md), 데이터 생성·조회·Unity 배치 검증은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)를 따른다. Provider·UI·연출 연결은 미구현이다. 아래 미구현 클래스 구성은 설계 제안이며 실제 상태 원본은 GameSession이 직접 소유한다.
 
 ---
 
@@ -21,7 +21,7 @@
 현재 LastSupply에서 확인한 상태는 다음과 같다.
 
 - Unity 버전 파일: `6000.3.20f1`.
-- 게임 전용 Core 코드는 `Assets/01_Main/02_Scripts/Core`에 있다. 역할별 하위 폴더에 데이터 정의·상태·규칙·난수·기본 콘텐츠를 배치했다. GameSession과 사용자 asmdef는 아직 없다.
+- 게임 전용 Core 코드는 `Assets/01_Main/02_Scripts/Core`에 있다. 역할별 하위 폴더에 데이터 정의·상태·규칙·난수·기본 콘텐츠를 배치했다. GameSession을 구현했으며 사용자 asmdef는 없다. 콘텐츠 설정·변환·Editor 도구는 `Assets/01_Main/02_Scripts/Content`, 기본 에셋은 `Assets/01_Main/04_Resource/Content`에 있다.
 - manifest에는 uGUI `2.0.0`, Input System `1.19.0`, Test Framework `1.6.0`이 등록되어 있다.
 - HM CodeBase는 `Packages/manifest.json`에 Git 패키지로 등록되어 있으며, LastSupply의 PackageCache에서 **`1.0.1`**, 캐시 식별자 `fb08effd5ffc`를 확인했다. `Packages/packages-lock.json`의 Git 해시는 `fb08effd5ffc8afab1d4e428c7a1ca9574c3d504`다. 버전은 package.json과 lock 파일, 동작은 실제 Runtime 소스를 기준으로 설명한다.
 - UniTask는 UPM manifest 항목이 아니라 `Assets/Plugins/UniTask`에 있으며, 해당 package.json의 버전은 `2.5.11`이다. 같은 라이브러리를 다시 UPM으로 중복 등록하는 것을 전제로 하지 않는다.

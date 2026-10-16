@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931f9e2c5a3daab4e8dcfadfde813531, type: 3}
+  m_Name: REGION_WAREHOUSE
+  m_EditorClassIdentifier: Assembly-CSharp::LastSupply.Content.RegionConfig
+  _id: REGION_WAREHOUSE
+  _displayName: "\uACF5\uC5C5 \uCC3D\uACE0"
+  _description: "\uAD6C\uC870 \uC694\uCCAD\uC5D0 \uD544\uC694\uD55C \uBD80\uD488\uC744
+    \uCC3E\uC744 \uC218 \uC788\uB294 \uACF5\uC5C5 \uCC3D\uACE0."
+  _backgroundSprite: {fileID: 0}
+  _mainResource: 2
+  _events:
+  - {fileID: 11400000, guid: 735d342905519c946a018c228fca7351, type: 2}
+  - {fileID: 11400000, guid: 5c0693d26a834ca48a4888cd57184ce9, type: 2}
+  - {fileID: 11400000, guid: bf573edb6e100a84683cb3ad93379759, type: 2}
+  - {fileID: 11400000, guid: 1c5c6d08e07dc094a9bf4178eefdd53a, type: 2}
+  - {fileID: 11400000, guid: f6d5111ce745d3b4b911fe7248881b26, type: 2}
+  _useCustomSearchRewards: 0
+  _searchRewards: []

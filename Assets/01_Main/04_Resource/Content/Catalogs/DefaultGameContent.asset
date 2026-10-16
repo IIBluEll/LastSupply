@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 113c25a068475eb43a521170471c5475, type: 3}
+  m_Name: DefaultGameContent
+  m_EditorClassIdentifier: Assembly-CSharp::LastSupply.Content.GameContentCatalog
+  _gameConfig: {fileID: 11400000, guid: 686eaf7a1bc58384f8a9178417885b6f, type: 2}
+  _survivors:
+  - {fileID: 11400000, guid: 16d2cabe243dbde40bb09daa83c1dda8, type: 2}
+  - {fileID: 11400000, guid: 0d5a0d2df28102f4882b412937a6c155, type: 2}
+  _regions:
+  - {fileID: 11400000, guid: 15924f92aafd9ae4b87937237536ceba, type: 2}
+  - {fileID: 11400000, guid: 0a5c7cf37758d9647ac1748673cef52b, type: 2}
+  - {fileID: 11400000, guid: bbff2a89763f8a54183078f74a473c29, type: 2}
+  _events:
+  - {fileID: 11400000, guid: 735d342905519c946a018c228fca7351, type: 2}
+  - {fileID: 11400000, guid: 5c0693d26a834ca48a4888cd57184ce9, type: 2}
+  - {fileID: 11400000, guid: bf573edb6e100a84683cb3ad93379759, type: 2}
+  - {fileID: 11400000, guid: 1c5c6d08e07dc094a9bf4178eefdd53a, type: 2}
+  - {fileID: 11400000, guid: f6d5111ce745d3b4b911fe7248881b26, type: 2}

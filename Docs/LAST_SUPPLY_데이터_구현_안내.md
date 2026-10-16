@@ -1,6 +1,6 @@
 # LAST SUPPLY 데이터 구현 안내
 
-> **2026-10-16 후속 구현:** GameSession의 순수 C# 진행·정산을 연결했다. 최신 사용법과 검사는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md)를 따른다. 아래는 2026-10-15 데이터 구현 시점의 기록이다.
+> **2026-10-16 후속 구현:** GameSession과 콘텐츠 카탈로그·기본 에셋 12개를 구현했다. 데이터 시작점과 에디터 메뉴·검증 기록은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md), 진행 API는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md)를 따른다. 아래는 2026-10-15 데이터 구현 시점의 기록이다.
 
 > 2026-10-15 / 게임 기획서·코드 설계서 v0.3 기준
 >

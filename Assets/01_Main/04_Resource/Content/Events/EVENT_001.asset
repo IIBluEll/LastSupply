@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add15bedd6ad4cb4838cbf5ffcbf8d5c, type: 3}
+  m_Name: EVENT_001
+  m_EditorClassIdentifier: Assembly-CSharp::LastSupply.Content.EventConfig
+  _id: EVENT_001
+  _displayName: "\uC7A0\uAE34 \uBCF4\uAD00\uD568"
+  _description: "\uC7A0\uAE34 \uBCF4\uAD00\uD568 \uC548\uC5D0\uC11C \uC4F8 \uB9CC\uD55C
+    \uBB3C\uC790\uAC00 \uBCF4\uC778\uB2E4."
+  _category: 0
+  _mode: 2
+  _minStage: 1
+  _maxStage: 5
+  _instantEffect:
+    _hpChange: 0
+    _noiseIncrease: 0
+    _rewards: []
+  _actions:
+  - _id: UNLOCK
+    _text: "\uC790\uBB3C\uC1E0 \uD574\uC81C"
+    _requiresCheck: 1
+    _statType: 2
+    _difficulty: 14
+    _effect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards:
+      - _useRegionResource: 1
+        _resourceType: 0
+        _amount: 2
+    _failureEffect:
+      _hpChange: 0
+      _noiseIncrease: 1
+      _rewards: []
+  - _id: FORCE_OPEN
+    _text: "\uAC15\uC81C\uB85C \uAC1C\uBC29"
+    _requiresCheck: 1
+    _statType: 1
+    _difficulty: 11
+    _effect:
+      _hpChange: 0
+      _noiseIncrease: 2
+      _rewards:
+      - _useRegionResource: 1
+        _resourceType: 0
+        _amount: 2
+    _failureEffect:
+      _hpChange: -2
+      _noiseIncrease: 2
+      _rewards: []
+  - _id: PASS
+    _text: "\uC9C0\uB098\uCE5C\uB2E4"
+    _requiresCheck: 0
+    _statType: 0
+    _difficulty: 12
+    _effect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards: []
+    _failureEffect:
+      _hpChange: 0
+      _noiseIncrease: 0
+      _rewards: []
