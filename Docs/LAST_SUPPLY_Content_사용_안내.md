@@ -5,6 +5,8 @@
 > 카탈로그, 기본 데이터 에셋 12개, ID 조회, 생성·검증 메뉴를 구현했습니다.
 > 사용자 담당 범위는 Unity 인게임 연결·Provider·UI·연출입니다.
 
+> **후속 구현:** 사용자 요청으로 탐색 UI와 Provider 연결까지 추가했습니다. 현재 실행 방법과 UI 검사는 [Exploration 프로토타입 사용 안내](LAST_SUPPLY_Exploration_프로토타입_사용_안내.md)를 따릅니다. 아래 7장은 최초 데이터 인계 시점의 작업 순서입니다.
+
 ## 1. 시작할 에셋
 
 `Assets/01_Main/04_Resource/Content/Catalogs/DefaultGameContent.asset`을 사용합니다.

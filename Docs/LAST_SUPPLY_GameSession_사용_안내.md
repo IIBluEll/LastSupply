@@ -2,7 +2,7 @@
 
 > 2026-10-16 / 게임 기획서·코드 설계서 v0.3 기준.
 >
-> 순수 C# 진행과 콘텐츠 카탈로그·기본 에셋을 구현했다. 데이터 시작점은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)를 따른다. Provider·UI·연출 연결과 원래 프로젝트의 Unity 전체 컴파일·Play Mode·빌드는 별도 작업이다.
+> 순수 C# 진행과 콘텐츠 카탈로그·기본 에셋을 구현했다. 데이터 시작점은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)를 따른다. 이후 추가한 Provider·탐색 UI 연결과 Play Mode 검사 범위는 [Exploration 프로토타입 사용 안내](LAST_SUPPLY_Exploration_프로토타입_사용_안내.md)에 기록했다. 원본 프로젝트 전체 검증·연출·빌드는 별도 작업이다.
 
 ## 1. 상태 소유와 시작
 

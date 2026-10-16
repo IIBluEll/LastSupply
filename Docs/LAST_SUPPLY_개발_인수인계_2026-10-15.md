@@ -1,244 +1,213 @@
 # LAST SUPPLY 개발 인수인계
 
-> **2026-10-16 후속 구현:** 사용자의 GameSession 직접 작성 요청에 따라 순수 C# 진행·정산·치료·승패와 검사를 추가했다. 최신 상태는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md)를 따른다. 아래는 2026-10-15 인수인계 기록이며 Session 미구현·파일 수·Git 상태 표기는 당시 기준이다. Unity 연결은 별도 작업이다.
-
-> 작성일 / 갱신일: 2026-10-15 / 2026-10-15
+> 최초 작성: 2026-10-15 / 최종 갱신: 2026-10-16
 >
-> 기준: 게임 기획서 v0.3, 코드 설계서 v0.3, 현재 프로젝트 파일과 이 채팅의 작업·검증 기록.
+> 기준: 게임 기획서·코드 설계서 v0.3, 현재 프로젝트 파일, 이전 구현·검증 기록.
 >
-> 현재 상태: Core 23개 스크립트와 기본 콘텐츠 데이터 작성. 직전 데이터 구현 작업에서 Core C# 컴파일과 392개 검사 통과. GameSession과 플레이 가능한 탐색 흐름은 아직 미구현.
+> **현재 상태:** Core·콘텐츠 데이터·GameSession·은신처 MVP·Exploration 프로토타입 연결 완료. 생존자·지역 선택부터 사건 표시, 수색, 귀환, 일일 정산, 다음 날 또는 게임 종료까지 연결되어 있습니다. 치료와 새 게임은 Core에서 지원하지만 UI 연결은 남아 있습니다.
 >
-> 이번 갱신은 문서 작업이다. C# 코드·Scene·Prefab·Inspector·패키지·프로젝트 설정·Git 인덱스를 변경하거나 검사를 재실행하지 않았다.
+> 이번 갱신은 인수인계 문서만 수정했습니다. 게임 코드·Scene·Prefab·패키지·프로젝트 설정·Git 인덱스는 변경하지 않았으며, 아래 실행 검사는 이번 문서 갱신에서 재실행하지 않았습니다. 기존 문서 링크를 유지하기 위해 파일명의 날짜는 보존합니다.
 
-## 1. 재개 시 가장 먼저 확인할 내용
+## 1. 다른 PC·다음 채팅에서 먼저 할 일
 
-1. 이 문서와 아래 문서를 읽고 실제 Core 파일을 확인한다.
-   - [Core 스크립트 설명서](LAST_SUPPLY_Core_스크립트_설명서.md): 23개 파일의 역할·주요 데이터·함수·연결 관계.
-   - [데이터 구현 안내](LAST_SUPPLY_데이터_구현_안내.md): 기본 콘텐츠 생성 방법과 재실행 검사.
-   - [게임 기획서](LAST_SUPPLY_게임_기획서.md): 기본판 규칙과 수치.
-   - [코드 설계서](LAST_SUPPLY_코드_설계서.md): Session·Unity 연결·결과 확정·수명 관리 기준.
-2. 새 PC에 Core 23개 파일과 각 .meta, Docs의 문서 5개, Tests/CoreData/Verify-CoreData.ps1이 전달됐는지 확인한다.
-3. git status와 최근 커밋을 확인한다. 파일이 스테이징되어 있어도 커밋·푸시 완료를 뜻하지 않는다.
-4. PowerShell 7에서 아래 검사를 실행하고, Unity 전체 컴파일·Console은 별도로 확인한다.
-5. 데이터 정의를 중복 작성하지 말고, 4장의 사건 판정 계산과 GameSession 연결을 사용자와 함께 시작한다.
+1. 이 문서와 [Exploration 프로토타입 사용 안내](LAST_SUPPLY_Exploration_프로토타입_사용_안내.md)를 읽습니다. 예전 안내의 `GameSession 미구현`, `Provider·최소 UI 연결 예정` 문구는 현재 진행 상태가 아닙니다.
+2. Git 상태와 최신 커밋을 확인하고, Assets·Packages·ProjectSettings·Docs·Tests 및 `.meta`가 전달되었는지 확인합니다. 스테이징만으로는 다른 PC에 전달되지 않습니다.
+3. Unity 6000.3.20f1에서 패키지 복원과 임포트를 완료하고 Console의 컴파일 오류를 확인합니다.
+4. `Assets/01_Main/01_Scene/SampleScene.unity`를 열고 기존 Provider의 카탈로그·은신처 View 참조를 확인합니다. Provider는 화면을 닫아도 함께 비활성화되지 않도록 은신처 Panel과 별도 오브젝트에 둡니다.
+5. Play에서 생존자와 지역을 선택해 출발합니다. Provider의 `_explorationView`가 비어 있으면 기존 Canvas 아래에 탐색 화면을 생성하고 은신처의 TMP 폰트를 재사용합니다. 기본 프로토타입 사용에 별도의 탐색 View 수동 연결은 필요하지 않습니다.
+6. 실제 화면에서 사건 문구·버튼·정산까지 확인한 뒤 5장의 다음 작업을 진행합니다. 이미 완료한 데이터 정의·GameSession·탐색 MVP를 다시 작성하지 않습니다.
 
-```powershell
-pwsh -NoProfile -File .\Tests\CoreData\Verify-CoreData.ps1
-```
+첫 단계의 기본 확률은 사건 없음 65%, 기회 20%, 위험 15%입니다. 출발 직후 사건 대신 수색 화면이 나오는 것은 정상입니다. 사건 표시를 위해 재굴림하거나 확률을 임의로 바꾸지 않습니다.
 
-**중요:** 과거 인수인계의 SurvivorState 이름 불일치는 해결됐다. 현재 파일은 definition.MaxHP와 definition.ID를 참조한다. 다시 컴파일 복구나 전체 명명 변경부터 시작하지 않는다.
+## 2. 완료된 구현과 파일 위치
 
-## 2. 현재 완료한 구현
+게임 스크립트 루트는 `Assets/01_Main/02_Scripts`이며 현재 C# 파일은 총 **55개**입니다. 외부 플러그인과 Tests의 검사 코드는 이 수에 포함하지 않습니다.
 
-Core 루트는 `Assets/01_Main/02_Scripts/Core`, 네임스페이스는 `LastSupply.Core`다. 모든 Core 코드는 순수 C#이며 UnityEngine·UniTask·HM CodeBase에 의존하지 않는다.
-
-| 폴더 | 파일 | 현재 책임 |
+| 영역 | 파일 수·위치 | 완료한 책임 |
 |---|---|---|
-| Data | DefaultGameData.cs | 기획 수치를 넣은 기본판·시제품 GameDefinition 생성 |
-| Definitions | GameDefinition.cs | 규칙·생존자·지역·일반 사건 묶음, 콘텐츠 참조와 후보 검증 |
-| Definitions | GameRulesDefinition.cs | 단계·소음·생존 설정, 수색·사건 확률·귀환 표와 전체 구간 검증 |
-| Definitions | SurvivorDefinition.cs | ID·이름·최대 HP·전투·기술 보정 |
-| Definitions | RegionDefinition.cs | 지역 ID·이름·주 자원·사용 사건 ID·선택적 지역 수색표 |
-| Definitions | EventDefinition.cs | 일반 사건의 범주·처리 방식·등장 단계·상황·효과·행동 |
-| Definitions | EventActionDefinition.cs | 행동 ID·문구·판정 유무·능력치·DC·확정/성공/실패 효과 |
-| Definitions | EventEffectDefinition.cs | HP 증감·소음 증가·자원 보상 목록 |
-| Definitions | SearchRewardDefinition.cs | 단계·D20 구간별 수색 보상 행, Contains |
-| Definitions | SearchRewardItemDefinition.cs | 비음수 보상 수량과 선택적 자원 종류 |
-| Definitions | StageEventChanceDefinition.cs | 단계별 사건 없음·기회·위험 확률, 합계 100% 검사 |
-| Definitions | ReturnRiskDefinition.cs | 소음 구간·위험 표시·귀환 사건 확률·실패 피해 |
-| Definitions | ReturnEventDefinition.cs | 귀환 사건 ID·상황·행동·능력치·DC |
-| Enums | RESOURCE_TYPE.cs | FOOD / MEDICINE / PARTS |
-| Enums | STAT_TYPE.cs | NONE / COMBAT / TECH |
-| Enums | EVENT_CATEGORY.cs | OPPORTUNITY / DANGER |
-| Enums | EVENT_MODE.cs | INSTANT / CHECK / CHOICE |
-| States | SurvivorState.cs | 생존자 ID·현재 HP·생존 여부 |
-| States | ExpeditionState.cs | 파견 생존자·지역 ID·현재 단계·소음·임시 전리품 |
-| Resources | ResourceAmount.cs | 비음수 자원 수량, IsEmpty, 새 값을 반환하는 Add |
-| Rules | ExplorationRules.cs | 수색 보상 선택·합산, D20 + 보정 >= DC 계산 |
-| Random | IRandomSource.cs | NextInt(minInclusive, maxExclusive) 규약 |
-| Random | GameRandom.cs | System.Random 구현, 기본/seed 생성자, 잘못된 범위 거절 |
+| Core | 33개 / `Core` | 읽기 전용 정의·상태, 탐색·생존 규칙, 난수, GameSession·Snapshot·결과·정산 |
+| Content | 14개 / `Content` | Config 5개·직렬화 데이터 7개·Editor 도구 2개, 카탈로그 변환·ID 조회·검증 |
+| Game | 1개 / `Game/LastSupplyGameProvider.cs` | 카탈로그로 Session 생성, 명령 전달, 화면 전환, Presenter 수명 관리 |
+| 은신처 UI | 3개 / `UI/Shelter` | Model·View·Presenter, 생존자·지역 선택, 출발, 상태·거절 사유 표시 |
+| 탐색 UI | 4개 / `UI/Exploration` | Model·View·Presenter와 런타임 화면 생성기, 사건부터 정산·종료까지 표시·입력 |
 
-Core 폴더 정리 시 스크립트와 기존 .meta를 함께 이동했고, 당시 30개 파일의 내용 보존을 확인했다. 데이터 추가 작업에서는 새 스크립트의 .meta와 Data 폴더 .meta를 작성하고 Core 내 GUID 유효성·중복 여부를 확인했다.
+### 2.1 Core와 GameSession
 
-### 2.1 생성해서 사용할 데이터
+- `GameSession`이 날짜·생존자 HP·은신처 자원·활성 탐색·미확인 결과·종료 사유의 원본을 소유합니다. `GetSnapshot()`으로 읽기 전용 상태를 제공합니다.
+- 사건 범주 추첨·후보 필터·직전 단계 사건 중복 제외, 선택형·판정형·즉시 결과형 처리, 수색·생략·다음 단계·귀환·사망을 구현했습니다.
+- `ActionReport`에 이미 적용한 효과와 D20·보정·DC·실제 보상·HP/소음 전후 값을 보관합니다. 결과 확인으로 재굴림·재지급하지 않습니다.
+- `SurvivalRules`와 일일 정산, 식량 부족 피해, 전원 사망·목표 달성·기한 초과 판정, 치료를 구현했습니다.
+- 모든 외부 명령은 `expectedRevision`을 검증하며, 필요한 사건·행동·결과·정산 ID도 확인합니다. 거절된 요청은 상태·자원·게임 난수를 소비하지 않습니다.
+- 새 게임은 같은 정의와 새 난수원으로 **새 GameSession을 생성**합니다. 현재 Provider에는 새 게임 UI와 Session 교체 흐름이 없습니다.
+- 과거 `SurvivorState` 참조 오류는 해결됐습니다. 현재 `definition.ID`, `definition.MaxHP`를 사용하므로 옛 오류 복구나 전체 명명 변경부터 시작하지 않습니다.
 
-```csharp
-GameDefinition prototype = DefaultGameData.CreatePrototype();
-GameDefinition defaultGame = DefaultGameData.CreateDefault();
-```
+정확한 API·정산 순서는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md)를 따릅니다. 별도의 변경 가능한 `GameRunState`를 중복 원본으로 추가하지 않습니다.
 
-| 구성 | 생존자·지역·사건 |
+### 2.2 콘텐츠와 실제 에셋
+
+`GameContentCatalog.ToDefinition()`으로 ScriptableObject에서 순수 C# 정의를 생성합니다. 생존자·지역 ID 조회와 콘텐츠 참조·표 누락·중복·수치 검증을 제공합니다.
+
+`Assets/01_Main/04_Resource/Content`에 실제 기본 에셋 **12개**가 있습니다.
+
+| 폴더 | 구성 |
 |---|---|
-| CreatePrototype | 마커스 1명, 공업 창고 1곳, EVENT_001~003, RETURN_001 |
-| CreateDefault | 마커스·사라, 마트·병원·창고, EVENT_001~005, RETURN_001 |
+| Rules | `DefaultGameConfig.asset` 1개 |
+| Survivors | 마커스·사라 2개 |
+| Regions | 마트·병원·창고 3개 |
+| Events | `EVENT_001`~`EVENT_005` 5개 |
+| Catalogs | `DefaultGameContent.asset` 1개 |
 
-두 구성은 같은 기본 규칙을 사용하며 시제품만의 임시 게임 규칙은 없다. 생성할 때마다 별도의 정의 묶음을 만들지만, 생성만으로 게임이 시작되지는 않는다.
+귀환 사건 `RETURN_001`은 GameConfig 안의 데이터이며 별도 EventConfig 에셋이 아닙니다. 초상화·지역 배경 Sprite 참조는 비어 있습니다.
 
-공통 초기값은 최대 5단계·소음 6·7일, 식량 6/의약품 1/부품 0, 목표 부품 8, 하루 식량 소비 2, 부족 피해 2, 의약품 1당 HP 3 회복이다. 모두 기획의 초기 테스트 값이며 재미·밸런스 검증 결과가 아니다.
+Unity의 `Last Supply > Content` 메뉴에서 기본 에셋 생성·기본/선택 카탈로그 검증·회귀 검사를 실행할 수 있습니다. `Create Default Assets`는 대상 에셋 또는 `.meta`가 하나라도 존재하면 생성을 거절하므로 기존 데이터 갱신 도구로 사용하지 않습니다. `Run Content Checks`는 제공된 기본판과 수치가 같은지도 검사합니다. 의도적으로 밸런스를 바꾼 카탈로그는 구조 검증과 구분합니다.
 
-### 2.2 데이터 검증과 현재 한계
+`DefaultGameData.CreatePrototype()`과 `CreateDefault()`도 유지합니다. 전자는 마커스·창고·일반 사건 3개, 후자는 생존자 2명·지역 3곳·일반 사건 5개이며 두 구성은 같은 규칙을 사용합니다. 현재 Unity Provider의 시작 데이터는 연결된 카탈로그입니다.
 
-- 생성자는 null·잘못된 수치·필수 문구를 검사하고 목록 입력을 복사해 읽기 전용으로 노출한다.
-- GameRulesDefinition은 공통 수색표의 전체 단계/D20 구간, 단계별 사건 확률표, 귀환 소음표의 누락·중복·범위 초과를 검사한다.
-- GameDefinition은 같은 종류의 콘텐츠 ID 중복, 잘못된 지역 사건 참조, 지역 수색표 전체 구간, 사건 등장 단계, 일반 목록의 귀환 사건 ID를 검사한다.
-- 모든 지역·단계에 기회·위험 사건 후보가 필요하다. 현재 검증은 해당 범주 확률이 0%여도 후보를 요구한다.
-- EventDefinition은 즉시형 효과·행동 0개, 판정형 판정 행동 1개, 선택형 행동 2~3개와 사건 내부 행동 ID 중복을 검사한다.
-- EventEffectDefinition은 자원 획득·HP 증감·소음 증가를 표현한다. 자원 차감·소음 감소는 현재 지원하지 않으며 기본 콘텐츠에는 필요하지 않다.
-- SearchRewardItemDefinition은 사건 보상에도 재사용한다. 이름의 범위는 수색용이지만 현재 지급 대상·수량의 의미는 같다. 전체 명명 변경을 임의로 진행하지 않는다.
-- GameRulesDefinition의 초기 3인자 생성자는 전체 설정을 받는 생성자로 확장됐다. 현재 사용 예시는 DefaultGameData.CreateRules다.
-- SurvivorState·ExpeditionState는 getter만 제공한다. ExpeditionState의 ID 존재·단계/소음 상한 확인과 다음 상태 교체는 이후 Session에서 연결해야 한다.
-- DefaultGameData는 Unity 연결 전 Core 구현·검사를 위한 코드 기반 콘텐츠다. 최종 ScriptableObject 카탈로그 → GameDefinition 변환은 미구현이며 설계를 JSON·Resources 로딩으로 바꾼 것은 아니다.
+### 2.3 Provider·은신처·탐색 화면
 
-## 3. 유지할 게임·설계 결정
+- 은신처는 살아 있는 생존자와 지역을 선택해 출발합니다. Dropdown의 안내 항목은 미선택이며 실제 항목은 인덱스 1부터입니다.
+- Provider가 Session 명령을 전달하고 성공 후 현재 상태에 맞게 두 화면을 전환합니다. 두 UI의 Presenter는 표시·입력만 담당합니다.
+- `ExplorationPrototypeUI`는 기존 Canvas와 폰트로 최소 화면을 생성합니다. 나중에 직접 구성한 `ExplorationPanel_view`와 참조를 연결하면 그 화면을 사용합니다.
+- Provider와 두 Panel은 서로를 끄지 않는 계층이어야 합니다. Provider를 껐다 켜면 현재 Session과 Revision을 유지하며 화면을 복구합니다. 종료 시 Provider가 생성한 탐색 Panel만 정리합니다.
+- 탐색 구현에서는 원본 Scene·Prefab·콘텐츠 수치·프로젝트 설정을 수정하지 않았습니다. 현재 Git에 있는 기존 Scene 수정과 폰트/TMP 추가 상태는 그대로 보존합니다.
 
-### 3.1 첫 완성 목표
-
-PC 싱글, 2D 일러스트·텍스트·버튼 중심의 운 기반 생존 탐색 게임이다. 먼저 생존자 1명·지역 1곳·일반 사건 세 방식과 귀환 사건을 연결하여 다음 탐색 한 번을 완성한다.
-
-```text
-출발 → 단계 진입 사건 → 사건 결과 확인 → 수색/생략
-     → 다음 단계/귀환 → 생존 또는 사망 → 전리품 반영/폐기
-```
-
-기본판의 다일 생존·치료·승패와 콘텐츠 확대는 첫 탐색 이후 순차적으로 연결한다. 저장·장비·특성·재굴림은 기본판에 자동 추가하지 않는다.
-
-### 3.2 수색·사건·귀환
-
-- 수색은 단계당 최대 1회, 능력치 보정·자체 비용·자체 소음 없이 D20 한 번으로 보상 묶음을 결정한다.
-- 기본 콘텐츠는 마트=식량, 병원=의약품, 창고=부품의 단일 주 자원 보상표다. 혼합 보상 검사용 데이터를 기본판 수급에 넣지 않는다.
-- 항목의 ResourceType이 null이면 지역 주 자원이다. 같은 실제 자원으로 해석되는 항목은 합산한다. 세 자원이 모두 0일 때만 미발견이다.
-- 지역표가 null일 때만 공통표를 쓴다. 지정한 지역표는 전체 교체이며 누락을 공통표로 보충하지 않는다.
-- 사건 범주와 처리 방식은 독립적이다. STAT_TYPE.NONE은 보정 없는 판정이고, 판정 없음은 Difficulty == null이다.
-- 일반 사건에서 사망하면 수색·귀환 판정을 진행하지 않는다. 마지막 단계에서도 수색 또는 생략을 처리한 뒤 귀환한다.
-- 귀환 실패 피해는 ReturnRiskDefinition에만 보관한다. ReturnEventDefinition에 중복 저장하지 않는다.
-- 소음 0~2는 안전 귀환, 소음 6은 사건 발생 확정이다. 사건 발생과 행동 실패·사망은 서로 다른 판정이다.
-
-### 3.3 상태·난수·표현 경계
-
-- 향후 상태 원본은 GameSession이 소유하고, 규칙은 입력값으로 결과를 계산한다. Provider는 Unity 연결·작업 수명, UI MVP는 표시·입력을 담당한다.
-- Session만 게임 판정용 난수를 소비하고 연출 난수와 분리한다. 현재는 Session이 없어 이 보장이 연결된 상태가 아니다.
-- D20은 NextInt(1, 21), 확률 표본은 NextInt(0, 100)이다. 상한은 포함하지 않는다.
-- 확률 0%·100%, 후보 0개·1개는 설계에 따라 불필요한 난수를 소비하지 않는다.
-- 직전 단계에 사건이 없으면 직전 사건 ID도 비운다. 마지막으로 만난 사건 ID와 혼동하지 않는다.
-- 결과·보상을 연출 전에 확정하고 상태에 한 번 적용한다. 결과 확인·화면 재열기·연출 취소가 재굴림·재지급을 만들면 안 된다.
-- 잘못된 상태·ID·Revision 입력은 상태·자원·난수를 소비하지 않아야 한다. 결과 ID·Revision·명령 거절 처리는 미구현이다.
-- MVP는 UI에만 적용하고, 필요 없는 Manager·추상화·전역 이벤트를 미리 늘리지 않는다.
-
-## 4. 다음 작업 순서
-
-데이터 정의를 계속 늘리는 단계에서 실제 탐색을 연결하는 단계로 넘어간다. 아래는 후속 구현 기준이며 이번 문서 갱신에서 구현하지 않았다.
-
-1. **사건 관련 순수 계산:** 이미 있는 StageEventChanceDefinition과 EventDefinition을 사용해 범주 판정·등장 후보 필터·직전 단계 중복 제외를 작은 단위로 작성한다. 난수 생성은 Session에 남긴다. 귀환 위험 행 선택과 사건 효과의 다음 값 계산도 필요한 순서에 맞춰 추가한다.
-2. **진행 상태·결과와 GameSession:** GAME_PHASE, GameRunState, GameSnapshot, ActionReport, 결과 후속 흐름·ID·Revision을 필요한 만큼 정의하고 명령 검증을 연결한다. 출발 시 실제 단계 진입 사건을 처리하며 사건을 생략한 별도 시제품 규칙을 만들지 않는다.
-3. **첫 탐색 검증:** 고정 값을 반환하는 IRandomSource로 세 사건 방식, 수색/생략, 마지막 단계, 귀환, 사망, 전리품 반영/폐기, 중복 입력과 거절된 입력의 난수 미소비를 확인한다.
-4. **Unity 연결:** ScriptableObject 콘텐츠 변환, LastSupplyGameProvider, HM UI MVP와 최소 버튼·텍스트 화면을 연결한다. Scene·Prefab·Inspector·패키지·설정 변경은 별도 범위다.
-5. **연출과 기본판:** UniTask 연출·취소·재시작 수명을 연결하고 다일 정산·치료·승패를 구현한다. 하루 종료 순서는 기획서 3.4를 지킨다.
-
-**아직 없는 것:** 사건 추첨·효과 적용·귀환 계산, 확장된 탐색 상태, GameRunState/GameSession, GAME_PHASE, Snapshot/ActionReport/Revision, SurvivalRules, 다일 정산·승패·치료, ScriptableObject 콘텐츠·변환, Provider/UI/주사위 연출·재시작. 저장은 후속 후보다.
-
-기본 데이터에 2명·3지역·5사건이 모두 들어 있다는 사실은 그 콘텐츠로 게임을 플레이할 수 있다는 뜻이 아니다.
-
-## 5. 검증 기록과 재실행 방법
-
-| 구분 | 확인 수준 |
+| 상태 | 현재 화면에서 가능한 일 |
 |---|---|
-| 실제 소스·문서 확인 | Core 23개 파일 및 문서 검토. 이번 갱신에서 파일 목록·수정된 SurvivorState·패키지 설정을 다시 확인 |
-| 마지막 Core C# 컴파일 | 직전 데이터 구현 작업에서 실제 23개 파일을 PowerShell Add-Type으로 함께 컴파일하여 성공 |
-| 재실행 가능한 데이터 검사 | Tests/CoreData/Verify-CoreData.ps1 작성·실행, 392개 검사 통과 |
-| 검사 주요 범위 | 기본판·시제품, 기획 수치·사건 효과, 세 지역 수색 300가지, 잘못된 데이터 거절, 배열 복사·읽기 전용, 개발용 혼합 지역표 |
-| Core 메타데이터 | 데이터 추가 작업 시 스크립트/.meta 짝, Core GUID 유효성·중복 검사 통과 |
-| Core 설명 문서 | 직전 문서 작업 시 23개 파일 누락 없음·로컬 링크 26개 확인 |
-| Unity 전체 컴파일·Console | 확인하지 않음 |
-| EditMode / PlayMode / 빌드 / 실제 플레이 | 수행하지 않음 |
-| Session 진행·중복 지급·난수 미소비 | 로직 미구현으로 검증하지 않음 |
+| EVENT_ACTION | 일반 사건 제목·설명과 실제 행동 수에 맞는 버튼 1~3개 표시 |
+| SEARCH_CHOICE | 수색 또는 생략 |
+| STAGE_CHOICE | 다음 단계 또는 귀환 |
+| RETURN_ACTION | 귀환 사건·행동·실패 피해 표시와 판정 요청 |
+| RESULT | 확정된 결과·보상·HP/소음 변화 표시와 결과 확인 |
+| DAY_SUMMARY | 완료 날짜·전리품 회수/상실·식량 정산·사망 정보 표시와 정산 확인 |
+| GAME_OVER | 실제 종료 사유 표시 |
 
-이번 인수인계 갱신에서는 검사 스크립트를 재실행하지 않았다. 위 성공 기록은 해당 작업 시점의 결과이며, 새 PC나 이후 코드 변경 후에는 재실행한다.
+즉시 결과형 사건은 Core에서 효과를 적용한 뒤 곧바로 RESULT로 갑니다. 결과 확인과 정산 확인은 별도 버튼이며, 숨겨진 이전 버튼 입력이 다음 상태를 진행시키지 않도록 처리했습니다. 현재는 동기식 프로토타입이며 새 판은 Play를 다시 실행합니다.
 
-프로젝트 루트의 PowerShell 7에서 다음을 실행한다.
+## 3. 유지할 규칙과 구현 경계
+
+- Core는 UnityEngine·UniTask·HM CodeBase에 의존하지 않는 순수 C#입니다. Content는 편집용 데이터 변환, Provider는 Unity 연결, UI MVP는 표시와 입력을 맡습니다. MVP를 게임 규칙 전체로 확대하지 않습니다.
+- 게임 판정 난수는 Session에서 소비합니다. UI가 별도로 굴리거나 계산하지 않습니다. D20은 `NextInt(1, 21)`, 확률 표본은 `NextInt(0, 100)`이며 상한은 제외합니다.
+- Presenter는 화면에 **표시한 Snapshot.Revision과 ID**로 요청합니다. 오래된 버튼을 호출 직전 최신 Revision으로 포장하지 않습니다.
+- 수색은 단계당 최대 1회이며 보정·자체 비용·자체 소음 없이 D20 한 번으로 전체 보상 묶음을 정합니다. 같은 자원은 합산하고, 세 자원이 모두 0일 때만 미발견입니다.
+- 지역 전용 수색표가 있으면 공통표를 완전히 대체합니다. 누락된 구간을 공통표로 보충하지 않습니다. 기본판은 지역 주 자원 보상이며 개발용 혼합 보상을 임의로 섞지 않습니다.
+- 사건 범주와 처리 방식은 독립적입니다. `Difficulty == null`은 판정 없음, 판정 행동의 `STAT_TYPE.NONE`은 능력치 보정 0입니다.
+- 일반 사건에서 사망하면 수색·귀환 판정을 하지 않습니다. 마지막 단계에서도 수색 또는 생략 후 귀환합니다.
+- 귀환 사건 발생과 행동 실패는 별도 판정입니다. 실패해도 생존하면 전리품 전체를 회수하며, 사망하면 폐기합니다. 귀환 실패 피해의 원본은 ReturnRiskDefinition입니다.
+- 정산 순서는 전리품 반영/폐기 → 전원 사망 → 목표 달성 → 기한 초과 → 식량 소비·부족 피해 → 전원 사망 재확인입니다. 계속 진행하면 날짜를 넘깁니다.
+- DAY_SUMMARY 진입 시 정산은 끝나 있습니다. 표시할 완료 날짜는 `DaySummary.CompletedDay`이며 이미 다음 날인 `Snapshot.Day`와 구분합니다. 정산 확인에서 효과를 다시 적용하지 않습니다.
+- 연출을 추가해도 이미 확정된 결과를 보여 줍니다. 화면 재열기·취소·재시작으로 재굴림·중복 보상이 생기면 안 됩니다.
+
+기본 규칙의 초기값은 최대 5단계·소음 6·7일, 자원 6/1/0, 목표 부품 8, 하루 식량 2, 부족 피해 2, 의약품 1당 HP 3 회복입니다. 재미·밸런스 검증으로 확정한 수치는 아닙니다. 상세 표는 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)와 실제 에셋을 확인합니다.
+
+## 4. 검증 기록과 재실행
+
+다음은 **이전 구현 작업에서 실행한 기록**입니다. 이번 갱신에서는 파일·문서·환경·Git 상태를 대조했으며, 컴파일·Play Mode 검사를 다시 실행하지 않았습니다.
+
+| 검증 | 이전 실행 결과와 범위 |
+|---|---|
+| 게임 소스 컴파일 | 게임 C# 55개를 실제 Unity/TMP/uGUI 모듈과 HM MVP 소스로 C# 9 컴파일 성공 |
+| Core 데이터 | 392개 assertion 통과. 기본판·시제품·수색 300가지·오류 입력·읽기 전용 데이터 등 |
+| Session | 진입 45개·사건 46개·진행 156,933개 assertion 통과. 100개 seed의 게임 종료·새 Session 재시작 포함 |
+| Content / Unity | 임시 프로젝트에서 에셋 생성·저장·재임포트 후 검사, 새 Unity 프로세스에서 재로드 검사. 각 1,396개 assertion 통과 |
+| 콘텐츠 에셋 전달 | Unity 생성 에셋과 `.meta` 복사 시 해시 일치·참조 GUID 연결·중복 여부 확인 |
+| Exploration / Unity Play Mode | 별도 임시 프로젝트에서 100개 seed·8,338개 assertion 통과. 실제 Dropdown/Button의 `onValueChanged`/`onClick` 호출 |
+
+탐색 검사는 마커스·창고 조합으로 사건 세 방식, 수색·추가 탐색·귀환·정산·다음 날/종료, 사건 문구와 결과 값, 오래된 Revision 거절, 숨겨진 이전 버튼, Provider 비활성화/재활성화를 확인했습니다. 실제 게임 소스와 기본 데이터·폰트·uGUI/TMP·HM MVP 소스를 사용했지만 **원본 프로젝트의 모든 패키지와 원본 Scene을 통째로 실행한 검사는 아닙니다.**
+
+직접 마우스 입력, 레이아웃 육안 검수, 모든 생존자·지역 조합의 UI 실행, 원본 프로젝트 전체 Play Mode·플레이어 빌드, 재미·밸런스는 별도 확인이 필요합니다. 사용자는 앞선 은신처 연결 단계의 실행이 잘 된다고 보고했으며, 이를 최신 탐색 화면 전체의 수동 검증으로 확대하지 않습니다.
+
+이전 검증의 원시 로그는 Temp 아래에 생성됐으며 이번 확인에서는 해당 로그가 남아 있지 않았습니다. 위 수치는 기존 검증 기록이며 현재 로그를 다시 열어 확인한 결과가 아닙니다. 필요한 경우 아래 도구로 재생성합니다.
+
+프로젝트 루트의 PowerShell 7에서 실행합니다.
 
 ```powershell
 pwsh -NoProfile -File .\Tests\CoreData\Verify-CoreData.ps1
+pwsh -NoProfile -File .\Tests\CoreSession\Verify-CoreSession.ps1
+pwsh -NoProfile -File .\Tests\Exploration\Verify-Exploration.ps1
 ```
 
-검사는 실제 Core 파일을 컴파일하고 메모리에서 데이터를 생성·검증하며 프로젝트 파일을 변경하지 않는다. PowerShell이 .NET C#으로 컴파일한 결과를 Unity의 컴파일·플레이 검증으로 해석하지 않는다. 과거 임시 검사와 달리 데이터 검사 스크립트가 현재 저장소에 존재한다.
+Unity 경로가 다르면 다음처럼 지정합니다.
+
+```powershell
+pwsh -NoProfile -File .\Tests\Exploration\Verify-Exploration.ps1 -UnityPath 'C:\Program Files\Unity\Hub\Editor\6000.3.20f1\Editor\Unity.exe'
+```
+
+Core 두 검사는 .NET에서 실제 Core를 컴파일·검사합니다. 탐색 검사는 `Temp/ExplorationVerification-*`에 별도 프로젝트를 만들고 Unity Play Mode를 실행합니다. 기존 `Library/PackageCache`의 HM/uGUI 캐시와 `Assets/TextMesh Pro`, 프로젝트 폰트가 필요하므로 새 PC에서는 먼저 Unity 패키지 복원·임포트를 완료해야 합니다. 검사 Scene과 로그는 임시 프로젝트 안에 만들며 원본 Scene·패키지·설정을 덮어쓰지 않습니다.
+
+Content 검사는 Unity 메뉴 `Last Supply > Content > Run Content Checks`로 실행할 수 있습니다. 배치 진입점은 `LastSupply.Content.Editor.ContentVerification.Run`입니다.
+
+## 5. 남은 작업과 권장 순서
+
+| 순서 | 다음 작업 | 완료 기준 |
+|---|---|---|
+| 1 | 원본 SampleScene에서 직접 플레이 | 선택·출발·사건·수색/생략·추가 탐색/귀환·결과·정산·종료를 실제 입력으로 확인하고 문구·버튼 크기·폰트 잘림 점검 |
+| 2 | 은신처 치료와 새 게임 UI | 기존 Core의 TryHeal 사용, 새 Session 생성과 UI 갱신 연결. 종료 후 Play 재실행 없이 새 판 시작 |
+| 3 | 탐색 View 구성 보완 | 필요하면 수동 구성한 View로 교체, 상태별 가독성과 버튼 배치 확인. 현재 런타임 생성기는 프로토타입용 |
+| 4 | UniTask 주사위·보상 연출 | 결과는 미리 확정하고 연출만 비동기로 처리. 화면 닫힘·비활성화·재시작의 취소와 이전 콜백 무효화 확인 |
+| 5 | 반복 플레이와 수치 조정·빌드 | 자원 수급·생존 일수·위험 선택·진행 속도를 기록하고 기본값 조정, 대상 PC 플레이어 빌드 확인 |
+
+**바로 다음 작업은 1번 원본 화면 확인입니다.** 확인 후 기능 구현을 이어간다면 치료·새 게임 UI가 우선입니다. 치료 규칙과 승패·다일 정산은 이미 Core에 있으므로 새로 계산하지 않습니다. 현재 Provider에는 TryHeal 전달 함수도 없으므로 치료 연결 때 함께 추가해야 합니다.
+
+신규 일러스트, 저장/로드, 장비·특성·재굴림 등은 현재 완료 범위 밖이며 별도 요청 없이 추가하지 않습니다.
 
 ## 6. 환경·Git·PC 이동
 
-| 항목 | 이번 갱신에서 확인한 값 |
+| 항목 | 2026-10-16 문서 갱신 시 확인 |
 |---|---|
-| 현재 PC 프로젝트 루트 | F:/GitFork/LastSupply |
-| 이전 PC 프로젝트 루트 | D:/Fork/LastSupply — 경로를 고정해서 사용하지 않는다 |
-| Unity | 6000.3.20f1 |
-| Git | main, HEAD e7751f3 (개발 시작), remote 이름 origin |
-| 현재 Scene 및 빌드 설정 경로 | Assets/01_Main/01_Scene/SampleScene.unity |
-| HM CodeBase | Git UPM, 현재 캐시 package.json 1.0.1 |
-| HM CodeBase lock 해시 | fb08effd5ffc8afab1d4e428c7a1ca9574c3d504 |
-| UniTask | Assets/Plugins/UniTask, package.json 2.5.11 |
-| uGUI / Test Framework | manifest 2.0.0 / 1.6.0 |
-| DOTween | 앞선 검토에서 Assets/Plugins/Demigiant/DOTween 파일 존재 확인. 버전·실행 연동 미검증 |
+| 현재 프로젝트 루트 | `D:/Fork/LastSupply` — 이전 PC 경로를 코드에 고정하지 않습니다 |
+| Unity | `6000.3.20f1` |
+| Git | `main`, HEAD `48963cc` / GameSession 기반 탐색·생존 진행 로직 구현 |
+| 실행 Scene | `Assets/01_Main/01_Scene/SampleScene.unity` |
+| HM CodeBase | Git UPM, 현재 캐시 package.json `1.0.1` |
+| HM lock 해시 | `fb08effd5ffc8afab1d4e428c7a1ca9574c3d504` |
+| UniTask | `Assets/Plugins/UniTask`, `2.5.11` |
+| uGUI / Test Framework | manifest `2.0.0` / `1.6.0` |
 
-### 6.1 Git 스냅샷
+갱신 시작 시 Game/UI, 폰트·TMP, Scene, 관련 문서·검사 등 추가 136개·수정 4개 경로가 스테이징되어 있었습니다. **현재 HEAD에 최신 탐색 구현이 모두 들어 있다고 간주하지 않습니다.** 이 문서 갱신분은 추가 작업 트리 변경으로 남깁니다. 이후 사용자가 Git을 조작하면 이 스냅샷은 달라질 수 있습니다.
 
-이번 갱신 직전에는 Core 폴더 이동·새 데이터 코드와 .meta, 문서, 검사 스크립트, EditorBuildSettings 변경이 스테이징되어 있었다. HEAD는 e7751f3이며 이 작업들은 아직 그 커밋에 들어 있지 않다. 이번 문서 갱신분은 스테이징된 기존 인수인계서 위에 작업 트리 변경으로 남을 수 있다.
+원격과의 동기화·푸시 여부는 확인하지 않았습니다. 이번 요청에서 스테이징·커밋·푸시는 수행하지 않았으며 기존 인덱스와 사용자 변경을 보존합니다.
 
-이 스냅샷은 이후 사용자의 작업으로 달라질 수 있다. 원격과의 동기화·푸시 여부는 확인하지 않았으며, 에이전트는 이번 요청에서 스테이징·커밋·푸시를 수행하지 않았다. 기존 스테이징과 사용자 변경을 되돌리지 않는다.
+- Git으로 이동할 때는 필요한 변경의 커밋·푸시와 새 PC 반영을 확인합니다. 검사 코드와 문서도 포함합니다.
+- 파일 복사로 이동할 때는 Assets·Packages·ProjectSettings·Docs·Tests와 모든 필요한 `.meta`를 함께 전달합니다. 콘텐츠 에셋뿐 아니라 한글 폰트·TMP 리소스도 필요합니다.
+- Library·Temp·Obj·Logs는 소스 전달물과 구분하며 새 PC에서 재생성합니다. 임시 검증 로그를 장기 보관하려면 Temp 밖에 별도로 보관합니다.
+- UniTask는 Assets 플러그인이므로 UPM으로 중복 설치하지 않습니다. HM CodeBase는 manifest와 lock을 기준으로 복원합니다.
+- 새 PC의 기존 변경을 덮어쓰기 전에 차이를 확인합니다. 임포트 후 Console·검사 도구·실제 화면을 각각 확인합니다.
 
-### 6.2 다른 PC로 전달할 파일
+## 7. 협업과 수정 권한
 
-- Git 이동 시 최신 변경의 커밋·푸시와 새 PC의 반영 여부를 확인한다. 스테이징만으로는 다른 PC에 전달되지 않는다.
-- 복사 이동 시 Assets, Packages, ProjectSettings, Docs, Tests를 전달하고 Assets의 .meta를 함께 보존한다.
-- Library, Temp, Obj, Logs 등 .gitignore의 재생성 대상은 소스 전달물과 구분한다.
-- UniTask는 Assets 플러그인이므로 UPM으로 중복 설치하지 않는다. HM CodeBase는 manifest와 lock으로 복원한다.
-- 새 PC에서 Unity 임포트·패키지 복원을 기다린 뒤 데이터 검사와 Unity Console을 별도로 확인한다. 기존 작업이 있으면 덮어쓰기 전에 차이를 확인한다.
+사용자는 데이터와 GameSession 직접 구현을 위임했고, 은신처 UI는 코드 안내를 따라 작업했습니다. 이후 Exploration 프로토타입과 사건 표시까지 에이전트의 직접 구현을 명시적으로 요청하여 해당 연결을 완료했습니다. 사용자가 원래 인게임 로직·UI를 담당하려던 역할 분담과 이후 특정 작업 위임을 함께 고려합니다.
 
-## 7. 최신 협업·수정 권한
+이전 위임을 이후 모든 UI·기능 변경의 포괄 허가로 확대하지 않습니다. 현재 요청은 인수인계 문서 갱신입니다. 질문·코드 검토·설계 논의는 파일 수정 허가가 아니며, 직접 수정 요청이 있을 때 해당 범위만 변경합니다. 코드 권한을 Scene·Prefab·Inspector·패키지·프로젝트 설정 변경 허가로 확대하지 않습니다.
 
-- 사용자가 데이터 코드의 직접 작성을 승인하여 에이전트가 남은 데이터 정의·기본 콘텐츠·검사 코드를 작성했다. 이후 데이터 작업은 그 승인 범위 안에서 진행한다.
-- 진행 로직부터는 사용자가 참여한다. 다음 코드는 작은 단위로 제시하고 목적·구조 선택 이유·기존 동작 변화를 설명한다. 별도의 직접 수정 요청 없이 로직 파일을 임의로 생성·수정하지 않는다.
-- 질문·검토·설계 논의를 파일 수정 허가로 해석하지 않는다. 이번 요청은 인수인계서 갱신이며 게임 코드를 변경하는 요청이 아니다.
-- 코드 수정 권한을 Scene·Prefab·Inspector·패키지·프로젝트 설정 변경으로 확대하지 않는다.
-- 존댓말로 결론부터 간결하게 답한다. 사실·설계 제안·추측·미검증을 구분하고 사용자 의견에 무조건 동의하지 않는다.
-- 단순한 구조를 우선하고 범위 밖 리팩터링·이동·이름 변경·기능 추가는 먼저 제안한다. 기존 사용자 변경과 Git 스테이징을 보존한다.
+구현 시 기존 사용자 변경과 Git 스테이징을 보존하고 단순한 구조를 우선합니다. 범위 밖 리팩터링·이동·이름 변경은 먼저 제안합니다. 답변은 존댓말로 결론부터 말하고 코드 검토·컴파일·실행 검증을 구분합니다.
 
-### 7.1 C#·Unity 컨벤션
+C#·Unity 컨벤션은 사용자의 AGENTS.md 지시를 우선합니다. 핵심은 private/protected `_exampleVariable`, 매개변수 `exampleVariable`, 정적 `s_exampleVariable`, 상수/readonly `EXAMPLE_VARIABLE`, 이벤트 바인딩 `OnExampleActioned`, 비동기 대기 함수 `_async`, UI에만 MVP 적용, 열거형 이름·요소 UPPER_SNAKE_CASE입니다. Unity 참조의 Obj/Trans/Txt/Btn/Img/Drop 등 접미사를 함께 사용합니다. 짧은 문장·호출은 한 줄로 유지하고 실제 선언의 ID/Id·MaxHP/CurrentHp를 임의로 통일하지 않습니다.
 
-- private/protected 필드 _exampleVariable, 매개변수 exampleVariable, 정적 필드 s_exampleVariable, 상수/readonly 필드 EXAMPLE_VARIABLE. 우선순위는 상수·readonly → 정적 → 접근 제한자다.
-- 일반 함수 PascalCase, 코루틴 ExampleFunction_cor, 이벤트 바인딩 OnExampleActioned.
-- UniTask라도 동기 완료면 일반 이름을 사용한다. 비동기 완료를 기다리거나 진행 중 작업을 반환하면 ExampleFunction_async를 사용한다.
-- 인터페이스 I 접두사, 추상 클래스 A 접두사, 싱글톤 Provider 접미사. UI 컴포넌트는 기능명 + UI 종류다.
-- MVP는 UI에만 적용한다. Model_model, Class_view, Presenter_presenter 형식이다.
-- 구조체는 PascalCase, 열거형 이름·요소는 UPPER_SNAKE_CASE다.
-- Unity 참조는 Obj/Trans/Txt/Btn/Img/Input/Drop/Sprite/Animator/RectTrans 접미사와 필드 명명 규칙을 함께 적용한다.
-- 짧은 문장·호출·조건은 한 줄로 유지한다. 긴 코드만 가독성을 위해 줄바꿈하고 정상적인 블록 들여쓰기를 유지한다. 현재 소스의 if ( condition ), 인자 구분 ` , ` 관례를 따른다.
-- 기존 ID/Id, MaxHP/CurrentHp 혼용을 임의로 통일하지 않는다. 실제 선언과 참조를 맞춘다.
+## 8. 참고 문서와 다음 채팅용 요청
 
-## 8. 다음 채팅에 붙여 넣을 재개 요청
+- [게임 기획서](LAST_SUPPLY_게임_기획서.md): v0.3 게임 규칙과 수치.
+- [코드 설계서](LAST_SUPPLY_코드_설계서.md): 책임 경계와 현재 구현 상태.
+- [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md): 명령·Revision·결과·정산 규약.
+- [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md): 에셋·변환·생성/검증 메뉴와 기본 수치.
+- [Exploration 프로토타입 사용 안내](LAST_SUPPLY_Exploration_프로토타입_사용_안내.md): 현재 실행 방법·화면 구성・UI 검증 범위.
+- [Core 스크립트 설명서](LAST_SUPPLY_Core_스크립트_설명서.md)와 [데이터 구현 안내](LAST_SUPPLY_데이터_구현_안내.md): 초기 데이터 구현 당시 설명. 최신 파일 수·진행 상태는 이 인수인계서와 후속 사용 안내를 우선합니다.
 
 ```text
 LastSupply 개발을 이어가려고 합니다.
-Docs/LAST_SUPPLY_개발_인수인계_2026-10-15.md,
-Core 스크립트 설명서·데이터 구현 안내와 기획서·코드 설계서 v0.3,
-Assets/01_Main/02_Scripts/Core의 실제 파일을 먼저 확인해 주세요.
+Docs/LAST_SUPPLY_개발_인수인계_2026-10-15.md와
+Exploration 프로토타입 사용 안내, 기획서·코드 설계서 v0.3,
+현재 Git 상태와 실제 코드를 먼저 확인해 주세요.
 
-현재 Core 23개와 기본 콘텐츠 데이터가 있습니다.
-DefaultGameData.CreatePrototype()은 마커스·창고·일반 사건 3개를 사용합니다.
-SurvivorState의 ID/MaxHP 참조 오류는 이미 해결됐습니다.
-Tests/CoreData/Verify-CoreData.ps1이 있으며 마지막 실행에서 392개 검사를 통과했습니다.
-이전 검사 결과를 현재 Unity 컴파일·플레이 검증으로 간주하지 마세요.
+현재 Core·Content·GameSession·은신처 MVP·Exploration 프로토타입이 있습니다.
+생존자·지역 선택 → 사건 → 수색/생략 → 추가 탐색/귀환 → 결과 → 정산 → 다음 날/종료가 연결돼 있습니다.
+기본 콘텐츠 에셋 12개와 게임 C# 55개가 있으며, 탐색 화면은 기존 Canvas 아래에 런타임으로 생성됩니다.
+첫 단계에 사건이 없으면 수색 화면이 나오는 것이 정상입니다.
 
-데이터 코드는 에이전트가 직접 작성하도록 승인했지만 진행 로직부터는 제가 참여합니다.
-로직 파일을 바로 수정하지 말고 작은 단위로 코드를 제시하고 이유를 설명해 주세요.
-다음은 기존 데이터를 사용하는 사건 범주 판정·후보 필터 계산과
-GameSession 연결을 준비하는 단계입니다. 이미 있는 데이터 정의를 다시 만들지 마세요.
-사건·수색·귀환·사망·전리품 반영/폐기가 이어지는 첫 탐색을 먼저 완성해 주세요.
+이전 별도 Unity Play Mode 검사에서 100개 seed·8,338개 assertion을 통과했지만
+원본 Scene의 수동 UI·레이아웃·전체 패키지 통합·빌드는 별도 확인이 필요합니다.
+다음은 원본 화면 확인이며, 이후 치료·새 게임 UI와 연출이 남아 있습니다.
+치료·다일 정산·승패는 Core에 이미 있으므로 다시 구현하지 마세요.
+
+우선 현재 상태와 다음 작업을 설명해 주세요.
+실제 코드 수정은 제가 직접 요청한 범위만 진행하고 Scene·Prefab·설정 변경으로 확대하지 마세요.
 ```
-
-## 9. 이번 채팅에서 달라진 점
-
-- 기존 SurvivorState 참조 오류가 해결된 실제 파일을 확인했다. Core 11개 전체가 컴파일되지 않던 이전 기록은 현재 상태가 아니다.
-- 사용자가 GameRulesDefinition·사건 열거형·효과·행동·사건 정의를 입력하고, 에이전트가 검토·컴파일·생성자 검사를 진행했다.
-- 사용자 요청으로 Core를 역할별 폴더로 정리하고 기존 스크립트와 .meta를 함께 이동했다.
-- 데이터 직접 작성 승인 후 사건 확률·귀환 정의·GameDefinition·기본판/시제품 데이터를 추가하고 GameRulesDefinition을 확장했다.
-- 재실행 가능한 데이터 검사 스크립트를 작성해 23개 Core 컴파일과 392개 검사 통과를 확인했다.
-- 데이터 구현 안내와 Core 전체 스크립트 설명서를 작성하고, 코드 설계서의 구현 현황을 갱신했다.
-- 자체 평가 결과는 ‘정의·상태 분리와 데이터 구성 방향은 기획에 부합하나, Session·첫 탐색 연결과 중복 입력 방지는 아직 미구현’이다. 다음 작업은 실제 흐름 연결에 집중한다.

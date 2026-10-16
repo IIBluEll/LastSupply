@@ -8,7 +8,7 @@
 >
 > **필수 사용 기술:** Unity / C# / UniTask / HM CodeBase
 >
-> **상태:** 설계 기준 문서. 2026-10-16에 GameSession과 콘텐츠 카탈로그·기본 에셋 12개를 구현했다. 진행 API는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md), 데이터 생성·조회·Unity 배치 검증은 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md)를 따른다. Provider·UI·연출 연결은 미구현이다. 아래 미구현 클래스 구성은 설계 제안이며 실제 상태 원본은 GameSession이 직접 소유한다.
+> **상태:** 설계 기준 문서. GameSession·콘텐츠 카탈로그·기본 에셋과 은신처·탐색 UI 프로토타입을 연결했다. 진행 API는 [GameSession 사용 안내](LAST_SUPPLY_GameSession_사용_안내.md), 데이터는 [Content 사용 안내](LAST_SUPPLY_Content_사용_안내.md), 탐색 화면과 Play Mode 검사 범위는 [Exploration 프로토타입 사용 안내](LAST_SUPPLY_Exploration_프로토타입_사용_안내.md)를 따른다. 연출·빌드·실제 플레이 검증은 별도 작업이며 실제 상태 원본은 GameSession이 직접 소유한다.
 
 ---
 
